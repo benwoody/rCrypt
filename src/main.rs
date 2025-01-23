@@ -1,21 +1,22 @@
+mod verify;
+mod command_line;
+
+use clap::Parser;
+
 fn main() {
-    use pgp::{Deserializable, Message, SignedPublicKey};
-    use std::fs;
 
-    let pub_key_file = "key.asc";
-    let msg_file = "msg.asc";
+    let args = command_line::Args::parse();
 
-    let key_string = fs::read_to_string(pub_key_file).unwrap();
-    let (public_key, _headers_public) = SignedPublicKey::from_string(&key_string).unwrap();
+    let pub_key_file = args.key;
+    let msg_file = args.message;
 
-    let msg_string = fs::read_to_string(msg_file).unwrap();
-    let (msg, _headers_msg) = Message::from_string(&msg_string).unwrap();
+    let public_key = verify::signed_key(pub_key_file);
 
-    // Verify this message
-    // NOTE: This assumes that the primary serves as the signing key, which is not always the case!
+    let msg = verify::message(msg_file);
+
     msg.verify(&public_key).unwrap();
 
-    let msg_content = msg.get_content().unwrap(); // actual message content
+    let msg_content = msg.get_content().unwrap();
     let msg_string = String::from_utf8(msg_content.unwrap()).expect("expect UTF8");
-    println!("Signed message: {:?}", msg_string);
+    println!("Signed message:\n{:?}", msg_string);
 }
