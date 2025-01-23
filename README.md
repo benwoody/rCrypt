@@ -5,5 +5,5 @@ Simple rust app to verify signed pgp messages. This was created to learn rust an
 Usage:
 
 ```sh
-rcrypt --key public_key.asc --message signed_messageasc
+rcrypt --key public_key.asc --message signed_message.asc
 ```
